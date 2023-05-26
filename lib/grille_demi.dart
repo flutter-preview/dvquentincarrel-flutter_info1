@@ -32,31 +32,82 @@ class _GrilleDemineur extends State<GrilleDemineur> {
           // Ligne -> Colonnes -> Cases
           children: [
             ..._grille.grille.map((row) {
-              int rowI = rowIM;
               colIM = 0;
               var colObj = Column(children: [
                 ...row.map((dCase) {
-                  int colI = colIM;
-                  var btn = OutlinedButton(
-                    onPressed: () => setState(() { _grille.mettreAJour(modele.Coup(rowI, colI, modele.Action.decouvrir)); }),
-                    onLongPress: () => setState(() { _grille.mettreAJour(modele.Coup(rowI, colI, modele.Action.marquer)); }),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(caseToColor(dCase)),
-                      foregroundColor: MaterialStatePropertyAll(Colors.white),
-                    ),
-                    child: Text(caseToText(dCase, false)),
-                  );
+                  var cell =  Cell(
+                     updateParent: updateParent,
+                     grille:_grille,
+                     x:colIM,
+                     y:rowIM,
+                     dCase:dCase); 
                   colIM++;
-                  return btn;
+                  return cell;
                 })
               ]);
               rowIM++;
               return colObj;
-            })
+            }),
+            Text(messageEtat(_grille))
           ]
         )
       )
     );
+  }
+
+  String messageEtat(modele.Grille grille)
+  {
+     if(grille.isGagnee()){
+         return "You won";
+     } else if(grille.isPerdue()) {
+         return "You lost";
+     } else {
+         return "More to do";
+     }
+  }
+
+  void updateParent(grille, x, y, action){
+     setState(() => {
+         grille.mettreAJour(modele.Coup(y, x, action)),
+     });
+
+  }
+}
+
+class Cell extends StatelessWidget {
+
+    final void Function(modele.Grille, int, int, modele.Action) updateParent;
+    final modele.Grille grille;
+    final int x;
+    final int y;
+    final modele.Case dCase;
+
+    const Cell({
+        super.key,
+        required this.updateParent,
+        required this.grille,
+        required this.x,
+        required this.y,
+        required this.dCase,
+    });
+
+  @override
+  Widget build(BuildContext context) {
+      var btn = SizedBox(
+          width: 50,
+          height: 50,
+          child: OutlinedButton(
+            onPressed: () => updateParent(grille, x, y, modele.Action.decouvrir),
+            onLongPress: () => updateParent(grille, x, y, modele.Action.marquer),
+            style: ButtonStyle(
+              backgroundColor: MaterialStatePropertyAll(caseToColor(dCase)),
+              foregroundColor: MaterialStatePropertyAll(Colors.white),
+            ),
+            child: Text(caseToText(dCase, false)),
+          ),
+      );
+
+      return btn;
   }
 
   // "*" If undiscovered, "#nb" if there are any, nothing otherwise
@@ -85,10 +136,5 @@ class _GrilleDemineur extends State<GrilleDemineur> {
     } else {
       return Colors.grey;
     }
-  }
-
-  String messageEtat(modele.Grille grille)
-  {
-    return "";
   }
 }

@@ -103,16 +103,22 @@ class Grille {
   // Découvre récursivement toutes les voisines d'une case qui vient d'être découverte
   void decouvrirVoisines(Coordonnees coordonnees) {
       Case curCase = getCase(coordonnees);
-      curCase.decouverte = true;
       if(!curCase.minee && !curCase.decouverte) {
+          curCase.decouverte = true;
           if(curCase.nbMinesAutour <= 0){
           getVoisines(coordonnees).forEach((elem) => decouvrirVoisines(elem));
           }
+      } else {
+          curCase.decouverte = true;
       }
   }
 
   // Met à jour la grille en fonction du coup joué
     void mettreAJour(Coup coup) {
+        if(isFinie()) {
+            print('Game over');
+            return;
+        }
         Case chosenCase = getCase(coup.coordonnees);
         if(coup.action == Action.decouvrir){
             decouvrirVoisines(coup.coordonnees);
@@ -130,6 +136,7 @@ class Grille {
             }
         }
     }
+    print('You won');
     return true;
   }
 
@@ -139,6 +146,7 @@ class Grille {
         for(int y = 0; y < taille; y++) {
             Case curCase = getCase(Coordonnees(y, x));
             if(curCase.decouverte && curCase.minee) {
+                print('You lost');
                 return true;
             }
         }
