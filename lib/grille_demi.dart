@@ -1,32 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:demineur/modele.dart' as modele;
 
-class GrilleDemineur extends StatefulWidget {
-  final int taille;
-  final int nbMines;
-  const GrilleDemineur(this.taille, this.nbMines);
+class GridScreen extends StatefulWidget {
+  final modele.Grille grille;
+
+  const GridScreen({super.key, required this.grille});
   @override
   State<StatefulWidget> createState() => _GrilleDemineur();
 }
 
-class _GrilleDemineur extends State<GrilleDemineur> {
-  late modele.Grille _grille;
-
-  @override
-  void initState() {
-    _grille = modele.Grille(widget.taille, widget.nbMines);
-    super.initState();
-  }
+class _GrilleDemineur extends State<GridScreen> {
 
   @override
   Widget build(BuildContext context)
   {
+    final modele.Grille _grille = widget.grille;
     int rowIM = 0;
     int colIM = 0;
+    double size = 900/widget.grille.taille;
     return MaterialApp(
       home:Scaffold(
         appBar: AppBar(
-          title: const Text("TP02 - Démineur")
+          title: const Text("TP02/3 - Démineur")
         ),
         body: Row(
           // Ligne -> Colonnes -> Cases
@@ -40,7 +35,8 @@ class _GrilleDemineur extends State<GrilleDemineur> {
                      grille:_grille,
                      x:colIM,
                      y:rowIM,
-                     dCase:dCase); 
+                     dCase:dCase,
+                     size: size); 
                   colIM++;
                   return cell;
                 })
@@ -80,6 +76,7 @@ class Cell extends StatelessWidget {
     final modele.Grille grille;
     final int x;
     final int y;
+    final double size;
     final modele.Case dCase;
 
     const Cell({
@@ -89,21 +86,30 @@ class Cell extends StatelessWidget {
         required this.x,
         required this.y,
         required this.dCase,
+        required this.size,
     });
 
   @override
   Widget build(BuildContext context) {
       var btn = SizedBox(
-          width: 50,
-          height: 50,
+          width: size,
+          height: size,
           child: OutlinedButton(
             onPressed: () => updateParent(grille, x, y, modele.Action.decouvrir),
             onLongPress: () => updateParent(grille, x, y, modele.Action.marquer),
             style: ButtonStyle(
               backgroundColor: MaterialStatePropertyAll(caseToColor(dCase)),
               foregroundColor: MaterialStatePropertyAll(Colors.white),
+              padding: MaterialStatePropertyAll(EdgeInsets.zero), // and this
             ),
-            child: Text(caseToText(dCase, false)),
+            child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                    caseToText(dCase, false),
+                    style: TextStyle(fontSize: size/2.5),
+                    textAlign: TextAlign.center,
+                )
+            ),
           ),
       );
 
