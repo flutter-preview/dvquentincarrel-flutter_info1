@@ -16,11 +16,17 @@ class Demineur extends StatefulWidget {
 enum ScreenState{home, grid, results}
 
 class _DemineurState extends State<Demineur> {
+
+    String pseudonym = "";
     late modele.Grille _grille;
     Stopwatch timer = Stopwatch();
     bool wasWon = false;
 
     ScreenState screenState = ScreenState.home;
+
+    void changeName(String newName){
+      pseudonym = newName;
+    }
 
     void gotoGrid(int size, int nbMines) {
         setState(() {
@@ -45,14 +51,18 @@ class _DemineurState extends State<Demineur> {
 
     Widget chooseScreenWidget() {
         switch(screenState) {
-            case ScreenState.home: { return HomeScreen(gotoGrid: gotoGrid); }
+            case ScreenState.home: { return HomeScreen(
+              gotoGrid: gotoGrid,
+              currentName: pseudonym,
+              changeName: changeName,
+            ); }
             case ScreenState.grid: {
                 timer.reset();
                 timer.start();
                 return GridScreen(grille: _grille, timer:timer, gotoRes: gotoResult);
             }
             case ScreenState.results: { 
-              return ResultScreen(timer: timer, isWon: wasWon, gotoMain: gotoMain); 
+              return ResultScreen(timer: timer, isWon: wasWon, gotoMain: gotoMain, playerName: pseudonym,); 
             }
         }
     }
