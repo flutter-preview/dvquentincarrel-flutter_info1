@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:demineur/home_page.dart';
-import 'package:demineur/grille_demi.dart';
+import 'package:demineur/game.dart';
 import 'package:demineur/results.dart';
 import 'package:demineur/modele.dart' as modele;
 

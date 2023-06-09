@@ -29,12 +29,13 @@ class _HomeScreen extends State<HomeScreen> {
       ["Medium", 15, 45],
       ["Hard", 35, 300],
     ];
-    int chosenOpt = -1;
+    int chosenOpt = 0;
     
 
     @override
     Widget build(BuildContext context) {
       widget.ctrl.text = widget.currentName;
+      final List<int> optionsRange = [for (int i = 0; i < options.length; i++) i];
 
       return Center(
         child: Column(
@@ -44,19 +45,27 @@ class _HomeScreen extends State<HomeScreen> {
               maxLength: 50,
               decoration: const InputDecoration(label: Text('Pseudonym')),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              itemBuilder: (ctx, index) => Column(
-              children: [OutlinedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(getColor(index, chosenOpt))
-                  ),
-                  onPressed: () => {chosenOpt = index, setState()},
-                  child: Text(options[index][0])
-                )]
-              ),
-              itemCount: options.length,
+            DropdownButton(
+              value: chosenOpt,
+              items: optionsRange.map(
+                    (optInd) => DropdownMenuItem(
+                      value: optInd,
+                      child: Text(
+                        options[optInd][0],
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                setState(() {
+                  chosenOpt = value;
+                });
+              },
             ),
+
             TextButton(
               onPressed: () => {
                 widget.changeName(widget.ctrl.text),
@@ -69,10 +78,6 @@ class _HomeScreen extends State<HomeScreen> {
           ]
         )
       );
-    }
-
-    Color getColor(curId, chosenId){
-      return curId == chosenId ? Colors.green : Colors.white;
     }
 
 }
