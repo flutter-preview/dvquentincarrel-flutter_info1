@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:demineur/modele.dart' as modele;
+import 'package:demineur/models/modele.dart' as modele;
 import 'package:demineur/widgets/sweeper.dart' as sweeper;
 
 class GridScreen extends StatefulWidget {

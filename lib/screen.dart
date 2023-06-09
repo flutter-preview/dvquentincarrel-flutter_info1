@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:demineur/home_page.dart';
-import 'package:demineur/game.dart';
-import 'package:demineur/results.dart';
-import 'package:demineur/modele.dart' as modele;
+import 'package:demineur/screens/home_screen.dart';
+import 'package:demineur/screens/game_screen.dart';
+import 'package:demineur/screens/results_screen.dart';
+import 'package:demineur/models/modele.dart' as modele;
+//import 'package:demineur/models/state.dart' as global_state;
 
 class Demineur extends StatefulWidget {
     const Demineur({super.key});

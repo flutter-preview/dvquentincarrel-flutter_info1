@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:demineur/modele.dart' as modele;
+import 'package:demineur/models/modele.dart' as modele;
 
 List makeGrid(modele.Grille grille,updateParent) {
   List rows;
@@ -14,15 +14,13 @@ List makeGrid(modele.Grille grille,updateParent) {
     var column = Column(children: [
     // For each column in the row, generate a cell
     ...row.map((dCase) {
-      var cell = Cell(
+      return Cell(
            updateParent: updateParent,
            grille:grille,
-           x:colIM,
+           x:colIM++,
            y:rowIM,
            dCase:dCase,
            size: size); 
-      colIM++;
-      return cell;
       })
     ]);
     rowIM++;
