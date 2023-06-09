@@ -1,18 +1,26 @@
+import 'package:demineur/screens/debug_screen.dart';
+import 'package:demineur/screens/game_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:demineur/models/modele.dart' as modele;
+import 'package:demineur/models/state.dart' as state;
 
 // Make stateful
 
 class HomeScreen extends StatefulWidget {
-    final Function(int size, int nbMines) gotoGrid;
-    final Function(String newName) changeName;
+    //final Function(int size, int nbMines) gotoGrid;
+    //final Function(String newName) changeName;
+    //final Function() gotoDebug;
     final String currentName;
     final ctrl = TextEditingController();
+    //state.GlobalState appState;
 
     HomeScreen({
       super.key,
-      required this.gotoGrid,
-      required this.changeName,
+      //required this.gotoGrid,
+      //required this.changeName,
       required this.currentName,
+      //required this.gotoDebug,
+      //required this.appState,
     });
 
   @override
@@ -30,6 +38,7 @@ class _HomeScreen extends State<HomeScreen> {
       ["Hard", 35, 300],
     ];
     int chosenOpt = 0;
+    late modele.Grille grille;
     
 
     @override
@@ -37,7 +46,8 @@ class _HomeScreen extends State<HomeScreen> {
       widget.ctrl.text = widget.currentName;
       final List<int> optionsRange = [for (int i = 0; i < options.length; i++) i];
 
-      return Center(
+      return Scaffold(
+      body: Center(
         child: Column(
           children: [
             TextField(
@@ -68,15 +78,26 @@ class _HomeScreen extends State<HomeScreen> {
 
             TextButton(
               onPressed: () => {
-                widget.changeName(widget.ctrl.text),
-                if(chosenOpt != -1 && widget.ctrl.text != ""){
-                  widget.gotoGrid(options[chosenOpt][1], options[chosenOpt][2])
+                //widget.changeName(widget.ctrl.text),
+                if(widget.ctrl.text != ""){
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => 
+                      GridScreen(gridSize: options[chosenOpt][1], nbMines: options[chosenOpt][2],)
+                    )
+                  )
                 }
               },
               child: const Text("Play")
-            )
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const DebugScreen())
+              ),
+              child: const Text("Debug")
+            ),
           ]
         )
+      )
       );
     }
 

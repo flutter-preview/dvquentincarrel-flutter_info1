@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:demineur/models/modele.dart' as modele;
+import 'package:demineur/screens/results_screen.dart';
 import 'package:demineur/widgets/sweeper.dart' as sweeper;
 
 class GridScreen extends StatefulWidget {
-  final modele.Grille grille;
-  final Stopwatch timer;
-  final void Function(Stopwatch, bool) gotoRes;
+  late modele.Grille grille;
+  Stopwatch timer = Stopwatch();
+  final int gridSize;
+  final int nbMines;
 
-  const GridScreen({super.key, required this.grille, required this.timer, required this.gotoRes});
+  GridScreen({super.key, required this.gridSize, required this.nbMines}){
+    grille = modele.Grille(gridSize, nbMines);
+    timer.reset();
+    timer.start();
+  }
   @override
   State<StatefulWidget> createState() => _GrilleDemineur();
 }
@@ -18,40 +24,49 @@ class _GrilleDemineur extends State<GridScreen> {
   Widget build(BuildContext context)
   {
     final modele.Grille _grille = widget.grille;
-    final Stopwatch timer = widget.timer;
+    final Stopwatch timer = Stopwatch();
     bool isOver = _grille.isFinie();
     if(isOver){
         timer.stop();
     }
-    return MaterialApp(
-      home:Scaffold(
-        appBar: AppBar(
-          title: const Text("TP02/3 - Démineur")
-        ),
-        body: Row(
-          // Ligne -> Colonnes -> Cases
-          children: [
-            ...sweeper.makeGrid(_grille, updateParent),
-            Text(messageEtat(_grille)),
-            Text(timer.elapsed.toString()),
-            Builder(
-              builder: (context) {
-                if(isOver){
-                    return OutlinedButton(
-                      onPressed: () => widget.gotoRes(timer, _grille.isGagnee()),
-                      child: const Text('Go to result screen')
-                    );
-                }
-                else{
-                    return OutlinedButton(
-                      onPressed: () => {},
-                      child: const Text('Keep on playing')
-                    );
-                }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("TP02/3 - Démineur")
+      ),
+      body: Row(
+        // Ligne -> Colonnes -> Cases
+        children: [
+          ...sweeper.makeGrid(_grille, updateParent),
+          Text(messageEtat(_grille)),
+          Text(timer.elapsed.toString()),
+          Builder(
+            builder: (context) {
+              if(isOver){
+                  return OutlinedButton(
+                    onPressed: () => {
+                      //Navigator.of(context).pop(context),
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => ResultScreen(
+                            isWon: _grille.isGagnee(),
+                            timer: timer,
+                            playerName: "Name lost in statelation"
+                          ),
+                        )
+                      )
+                    },//widget.gotoRes(timer, _grille.isGagnee()),
+                    child: const Text('Go to result screen')
+                  );
               }
-            )
-          ]
-        )
+              else{
+                  return OutlinedButton(
+                    onPressed: () => {},
+                    child: const Text('Keep on playing')
+                  );
+              }
+            }
+          )
+        ]
       )
     );
   }
