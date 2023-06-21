@@ -1,12 +1,11 @@
 import 'package:demineur/screens/home_screen.dart';
 import 'package:flutter/material.dart';
-//import 'package:demineur/screens/home_screen.dart';
-//import 'package:demineur/grille_demi.dart';
 import 'package:demineur/screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   //runApp(const GrilleDemineur(10,10));
-  runApp(const DemineurApp());
+  runApp(const ProviderScope(child:DemineurApp()));
 }
 
 class DemineurApp extends StatelessWidget {
@@ -16,7 +15,7 @@ class DemineurApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(currentName: ""),
+      home: HomeScreen(),
     );
   }
 

@@ -1,67 +1,63 @@
+import 'package:demineur/providers/player.dart';
 import 'package:demineur/screens/debug_screen.dart';
 import 'package:demineur/screens/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:demineur/models/modele.dart' as modele;
-import 'package:demineur/models/state.dart' as state;
+import 'package:demineur/models/difficulty.dart' as difficulty;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Make stateful
 
-class HomeScreen extends StatefulWidget {
-    //final Function(int size, int nbMines) gotoGrid;
-    //final Function(String newName) changeName;
-    //final Function() gotoDebug;
-    final String currentName;
-    final ctrl = TextEditingController();
-    //state.GlobalState appState;
+class HomeScreen extends ConsumerStatefulWidget {
 
-    HomeScreen({
-      super.key,
-      //required this.gotoGrid,
-      //required this.changeName,
-      required this.currentName,
-      //required this.gotoDebug,
-      //required this.appState,
-    });
+  const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() {
+  ConsumerState<HomeScreen> createState() {
     return _HomeScreen();
   }
 
 }
 
-class _HomeScreen extends State<HomeScreen> {
+class _HomeScreen extends ConsumerState<HomeScreen> {
 
-    final List<List<dynamic>> options = [
-      ["Easy", 7, 6],
-      ["Medium", 15, 45],
-      ["Hard", 35, 300],
-    ];
-    int chosenOpt = 0;
+    difficulty.Level chosenDiff = difficulty.Level.easy;
     late modele.Grille grille;
-    
+    late TextEditingController ctrl;
+    late String playerName;
+    late difficulty.Difficulty diff;
 
     @override
     Widget build(BuildContext context) {
-      widget.ctrl.text = widget.currentName;
-      final List<int> optionsRange = [for (int i = 0; i < options.length; i++) i];
+
+      playerName = ref.watch(playerProvider);
+      diff = difficulty.Difficulty(chosenDiff);
+
+      ctrl = TextEditingController();
+      ctrl.text = playerName;
+      ctrl.selection = TextSelection.fromPosition(TextPosition(offset: playerName.length));
+      ctrl.addListener(() {
+        ref.watch(playerProvider.notifier).setName(ctrl.text);
+      });
+
+      final List<difficulty.Level> options = [for (difficulty.Level level in difficulty.Level.values) level];
 
       return Scaffold(
       body: Center(
         child: Column(
           children: [
             TextField(
-              controller: widget.ctrl,
+              controller: ctrl,
               maxLength: 50,
               decoration: const InputDecoration(label: Text('Pseudonym')),
             ),
             DropdownButton(
-              value: chosenOpt,
-              items: optionsRange.map(
-                    (optInd) => DropdownMenuItem(
-                      value: optInd,
+              value: chosenDiff,
+              items: options.map(
+                    (difficulty) => DropdownMenuItem(
+                      value: difficulty,
                       child: Text(
-                        options[optInd][0],
+                        difficulty.name,
                       ),
                     ),
                   )
@@ -71,18 +67,18 @@ class _HomeScreen extends State<HomeScreen> {
                   return;
                 }
                 setState(() {
-                  chosenOpt = value;
+                  chosenDiff = value;
                 });
               },
             ),
 
             TextButton(
               onPressed: () => {
-                //widget.changeName(widget.ctrl.text),
-                if(widget.ctrl.text != ""){
+                //widget.changeName(ctrl.text),
+                if(ctrl.text != ""){
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => 
-                      GridScreen(gridSize: options[chosenOpt][1], nbMines: options[chosenOpt][2],)
+                      GridScreen(gridSize: diff.taille, nbMines: diff.nbMines,)
                     )
                   )
                 }
@@ -90,15 +86,18 @@ class _HomeScreen extends State<HomeScreen> {
               child: const Text("Play")
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const DebugScreen())
-              ),
+              onPressed: () => play(),
               child: const Text("Debug")
             ),
           ]
         )
       )
       );
+    }
+
+    void play() {
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DebugScreen()));
+      ref.watch(playerProvider.notifier).setName(ctrl.text);
     }
 
 }
