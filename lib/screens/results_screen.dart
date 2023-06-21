@@ -10,8 +10,9 @@ class ResultScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isWon = ref.read(gameProvider)['wasWon'] as bool;
     final String playerName = ref.read(playerProvider);
-    final Stopwatch timer = ref.read(gameProvider)['timer'] as Stopwatch;
     final int score = ref.read(scoreProvider)[playerName] as int;
+    final Stopwatch timer = ref.read(gameProvider)['timer'] as Stopwatch;
+    final String time = getTime(timer);
 
     String message = isWon ? "You won!" : "You lost.";
     return Scaffold(
@@ -21,10 +22,10 @@ class ResultScreen extends ConsumerWidget {
       body: Center(
       child: Column(
         children: [
-          Text(playerName),
+          Text('Player: $playerName'),
           Text(message),
-          Text('Duration of your last game: ' + timer.elapsed.toString()),
-          Text('Score:' + score.toString()),
+          Text('Duration of your last game: $time'),
+          Text('Best score: ${score.toString()}'),
           OutlinedButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Go to main menu'))
@@ -32,5 +33,12 @@ class ResultScreen extends ConsumerWidget {
         )
       )
     );
+  }
+
+  String getTime(Stopwatch timer){
+      String raw = timer.elapsed.toString();
+      int dotIndex = raw.indexOf('.');
+      String polished = raw.substring(0, dotIndex);
+      return polished;
   }
 }
