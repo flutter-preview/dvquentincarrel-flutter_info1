@@ -1,6 +1,5 @@
 import 'package:demineur/screens/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:demineur/screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
@@ -13,7 +12,7 @@ class DemineurApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomeScreen(),
     );

@@ -1,4 +1,4 @@
-enum Level {easy, medium, hard}
+enum Level {debug, easy, medium, hard}
 
 class Difficulty {
   int taille = 0;
@@ -7,6 +7,10 @@ class Difficulty {
 
   Difficulty(Level level) {
     switch(level){
+      case Level.debug:
+        taille = 10;
+        nbMines = 1;
+      break;
       case Level.easy:
         taille = 8;
         nbMines = 6;

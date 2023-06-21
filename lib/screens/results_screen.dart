@@ -1,32 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:demineur/providers/player.dart';
+import 'package:demineur/providers/game.dart';
+import 'package:demineur/providers/app.dart';
 
-class ResultScreen extends StatefulWidget {
-  final bool isWon;
-  final Stopwatch timer;
-  final String playerName;
-
-  const ResultScreen({super.key, required this.isWon, required this.timer, required this.playerName});
-  @override
-  State<StatefulWidget> createState() => _ResultScreen();
-}
-
-class _ResultScreen extends State<ResultScreen> {
-  
+class ResultScreen extends ConsumerWidget {
 
   @override
-  Widget build(BuildContext context)
-  {
-    String message = widget.isWon ? "You have won!" : "You lost.";
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool isWon = ref.read(gameProvider)['wasWon'] as bool;
+    final String playerName = ref.read(playerProvider);
+    final Stopwatch timer = ref.read(gameProvider)['timer'] as Stopwatch;
+    final int score = ref.read(scoreProvider)[playerName] as int;
+
+    String message = isWon ? "You won!" : "You lost.";
     return Scaffold(
       appBar: AppBar(
-        title: const Text("TP02/3 - Démineur")
+        title: Text(ref.read(barText))
       ),
       body: Center(
       child: Column(
         children: [
-          Text(widget.playerName),
+          Text(playerName),
           Text(message),
-          Text('Duration of your last game: ' + widget.timer.elapsed.toString()),
+          Text('Duration of your last game: ' + timer.elapsed.toString()),
+          Text('Score:' + score.toString()),
           OutlinedButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Go to main menu'))
@@ -36,4 +34,3 @@ class _ResultScreen extends State<ResultScreen> {
     );
   }
 }
-

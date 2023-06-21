@@ -1,37 +1,55 @@
-import 'package:flutter/material.dart';
 import 'package:demineur/models/modele.dart' as modele;
+import 'package:demineur/providers/app.dart';
+import 'package:demineur/providers/game.dart';
+import 'package:demineur/providers/player.dart';
 import 'package:demineur/screens/results_screen.dart';
 import 'package:demineur/widgets/sweeper.dart' as sweeper;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math';
 
-class GridScreen extends StatefulWidget {
+class GridScreen extends ConsumerStatefulWidget {
   late modele.Grille grille;
-  Stopwatch timer = Stopwatch();
+  // TODO: fetch those from the state
   final int gridSize;
   final int nbMines;
 
   GridScreen({super.key, required this.gridSize, required this.nbMines}){
     grille = modele.Grille(gridSize, nbMines);
-    timer.reset();
-    timer.start();
   }
+
   @override
-  State<StatefulWidget> createState() => _GrilleDemineur();
+  ConsumerState<GridScreen> createState() => _GrilleDemineur();
 }
 
-class _GrilleDemineur extends State<GridScreen> {
+class _GrilleDemineur extends ConsumerState<GridScreen> {
+
+  @override
+  void initState() {
+    final timer = ref.read(gameProvider)['timer'] as Stopwatch;
+    timer.reset();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context)
   {
+    final gameState = ref.read(gameProvider);
     final modele.Grille _grille = widget.grille;
-    final Stopwatch timer = Stopwatch();
     bool isOver = _grille.isFinie();
+    final Stopwatch timer = gameState['timer'] as Stopwatch;
+    int score = 0;
+    timer.start();
+
     if(isOver){
-        timer.stop();
+      timer.stop();
+      if(_grille.isGagnee()){
+        score = getScore(widget.gridSize, timer.elapsed);
+      }
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text("TP02/3 - Démineur")
+        title: Text(ref.read(barText))
       ),
       body: Row(
         // Ligne -> Colonnes -> Cases
@@ -41,29 +59,13 @@ class _GrilleDemineur extends State<GridScreen> {
           Text(timer.elapsed.toString()),
           Builder(
             builder: (context) {
-              if(isOver){
-                  return OutlinedButton(
-                    onPressed: () => {
-                      //Navigator.of(context).pop(context),
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => ResultScreen(
-                            isWon: _grille.isGagnee(),
-                            timer: timer,
-                            playerName: "Name lost in statelation"
-                          ),
-                        )
-                      )
-                    },//widget.gotoRes(timer, _grille.isGagnee()),
-                    child: const Text('Go to result screen')
-                  );
-              }
-              else{
-                  return OutlinedButton(
-                    onPressed: () => {},
-                    child: const Text('Keep on playing')
-                  );
-              }
+              return Visibility(
+                visible: isOver,
+                child: OutlinedButton(
+                  onPressed: () => gotoRes(_grille.isGagnee(), score),//widget.gotoRes(timer, _grille.isGagnee()),
+                  child: const Text('Go to result screen')
+                ),
+              );
             }
           )
         ]
@@ -86,6 +88,26 @@ class _GrilleDemineur extends State<GridScreen> {
      setState(() => {
          grille.mettreAJour(modele.Coup(y, x, action)),
      });
-
   }
+
+  // Updates state before going to results page
+  void gotoRes(bool wasWon, int score) {
+    final String name = ref.read(playerProvider);
+
+    ref.read(gameProvider.notifier).updateGame(wasWon: wasWon);
+    ref.read(scoreProvider.notifier).updateScore(name, score);
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => ResultScreen(),
+      )
+    );
+  }
+
+  int getScore(int gridSize, Duration elapsedTime){
+    int time = max(1, elapsedTime.inSeconds);
+    return gridSize * gridSize ~/ time;
+  }
+
 }
+

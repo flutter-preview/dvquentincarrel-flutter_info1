@@ -12,13 +12,17 @@ class GameState extends StateNotifier<Map<String, Object>>{
   });
 
   // Only updates provided values
-  void updateGame({int? difficulty, int? score, bool? wasWon}){
+  void updateGame({int? difficulty, int? score, bool? wasWon, Stopwatch? timer}){
     state['difficulty'] = difficulty ?? state['difficulty']!;
     state['score'] = score ?? state['score']!;
     state['wasWon'] = wasWon ?? state['wasWon']!;
+    // TODO: cleaner implementation
+    state['timer'] = timer ?? state['timer']!;
     state = {...state};
   }
+
   void debug() => print(state);
+
 }
 
 //// TODO: fix

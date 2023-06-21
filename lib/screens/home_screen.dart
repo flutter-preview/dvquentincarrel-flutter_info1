@@ -1,10 +1,10 @@
-import 'package:demineur/providers/player.dart';
-import 'package:demineur/screens/debug_screen.dart';
-import 'package:demineur/screens/game_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:demineur/models/modele.dart' as modele;
 import 'package:demineur/models/difficulty.dart' as difficulty;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:demineur/providers/player.dart';
+import 'package:demineur/providers/app.dart';
+import 'package:demineur/screens/game_screen.dart';
 
 // Make stateful
 
@@ -43,6 +43,9 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
       final List<difficulty.Level> options = [for (difficulty.Level level in difficulty.Level.values) level];
 
       return Scaffold(
+      appBar: AppBar(
+        title: Text(ref.read(barText))
+      ),
       body: Center(
         child: Column(
           children: [
@@ -73,6 +76,7 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
             ),
 
             TextButton(
+              child: const Text("Play"),
               onPressed: () => {
                 //widget.changeName(ctrl.text),
                 if(ctrl.text != ""){
@@ -83,21 +87,10 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
                   )
                 }
               },
-              child: const Text("Play")
-            ),
-            TextButton(
-              onPressed: () => play(),
-              child: const Text("Debug")
             ),
           ]
         )
       )
       );
     }
-
-    void play() {
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DebugScreen()));
-      ref.watch(playerProvider.notifier).setName(ctrl.text);
-    }
-
 }
