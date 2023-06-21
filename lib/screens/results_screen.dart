@@ -27,7 +27,7 @@ class ResultScreen extends ConsumerWidget {
           Text('Duration of your last game: $time'),
           Text('Best score: ${score.toString()}'),
           OutlinedButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).popUntil(ModalRoute.withName('/')),
             child: const Text('Go to main menu'))
           ]
         )

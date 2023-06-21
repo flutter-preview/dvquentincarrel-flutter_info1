@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:demineur/models/modele.dart' as modele;
 
+// Constructs every single cell of the grid
 List makeGrid(modele.Grille grille,updateParent) {
   List rows;
 

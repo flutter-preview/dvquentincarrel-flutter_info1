@@ -97,7 +97,7 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
     ref.read(gameProvider.notifier).updateGame(wasWon: wasWon);
     ref.read(scoreProvider.notifier).updateScore(name, score);
 
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ResultScreen(),
       )

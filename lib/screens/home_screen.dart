@@ -6,8 +6,6 @@ import 'package:demineur/providers/player.dart';
 import 'package:demineur/providers/app.dart';
 import 'package:demineur/screens/game_screen.dart';
 
-// Make stateful
-
 class HomeScreen extends ConsumerStatefulWidget {
 
   const HomeScreen({super.key});
