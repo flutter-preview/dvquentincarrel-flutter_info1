@@ -52,6 +52,7 @@ class Cell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isFini = grille.isFinie();
     var btn = SizedBox(
       width: size,
       height: size,
@@ -66,7 +67,7 @@ class Cell extends StatelessWidget {
       child: Align(
         alignment: Alignment.center,
         child: Text(
-          caseToText(dCase, false),
+          caseToText(dCase, isFini),
           style: TextStyle(fontSize: size/2.5),
           textAlign: TextAlign.center,
         )
@@ -83,7 +84,7 @@ class Cell extends StatelessWidget {
     if(laCase.marquee){
       return "⚑";
     }
-    if(!laCase.decouverte){
+    if(!laCase.decouverte && !isFini){
       return "*";
     }
     if(laCase.minee) {
@@ -95,7 +96,8 @@ class Cell extends StatelessWidget {
     }
   }
 
-  // Orange if marked, blue is undiscovered, grey otherwise
+  // Orange if marked, blue is undiscovered, grey otherwise.
+  // Everything undiscovered is green if won, and red if lost
   Color caseToColor(modele.Case laCase)
   {
     if(laCase.marquee) {
