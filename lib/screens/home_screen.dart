@@ -47,45 +47,55 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
       body: Center(
         child: Column(
           children: [
-            TextField(
-              controller: ctrl,
-              maxLength: 50,
-              decoration: const InputDecoration(label: Text('Pseudonym')),
+            SizedBox(
+              width: 500,
+              child: TextField(
+                controller: ctrl,
+                maxLength: 50,
+                decoration: const InputDecoration(label: Text('Pseudonym')),
+              )
             ),
-            DropdownButton(
-              value: chosenDiff,
-              items: options.map(
-                    (difficulty) => DropdownMenuItem(
-                      value: difficulty,
-                      child: Text(
-                        difficulty.name,
-                      ),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                if (value == null) {
-                  return;
-                }
-                setState(() {
-                  chosenDiff = value;
-                });
-              },
-            ),
-
-            TextButton(
-              child: const Text("Play"),
-              onPressed: () => {
-                //widget.changeName(ctrl.text),
-                if(ctrl.text != ""){
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => 
-                      GridScreen(gridSize: diff.taille, nbMines: diff.nbMines,)
-                    )
-                  )
-                }
-              },
-            ),
+            SizedBox(
+              width: 500,
+              child: Row(
+                children: [
+                  DropdownButton(
+                    value: chosenDiff,
+                    items: options.map(
+                          (difficulty) => DropdownMenuItem(
+                            value: difficulty,
+                            child: Text(
+                              difficulty.name,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) {
+                        return;
+                      }
+                      setState(() {
+                        chosenDiff = value;
+                      });
+                    },
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    child: const Text("Play"),
+                    onPressed: () => {
+                      //widget.changeName(ctrl.text),
+                      if(ctrl.text != ""){
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => 
+                            GridScreen(gridSize: diff.taille, nbMines: diff.nbMines,)
+                          )
+                        )
+                      }
+                    },
+                  ),
+                ]
+              )
+            )
           ]
         )
       )
