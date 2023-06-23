@@ -51,24 +51,42 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
       appBar: AppBar(
         title: Text(ref.read(barText))
       ),
-      body: Row(
-        // Ligne -> Colonnes -> Cases
-        children: [
-          ...sweeper.makeGrid(_grille, updateParent),
-          Text(messageEtat(_grille)),
-          Text(timer.elapsed.toString()),
-          Builder(
-            builder: (context) {
-              return Visibility(
-                visible: isOver,
-                child: OutlinedButton(
-                  onPressed: () => gotoRes(_grille.isGagnee(), score),//widget.gotoRes(timer, _grille.isGagnee()),
-                  child: const Text('Go to result screen')
-                ),
-              );
-            }
-          )
-        ]
+      backgroundColor: getBackgroundColor(isOver, _grille),
+      body: Center(
+        child: Column(
+          children: [
+            Row(
+              // Ligne -> Colonnes -> Cases
+              children: [
+                const Spacer(),
+                ...sweeper.makeGrid(_grille, updateParent),
+                const Spacer()
+              ]
+            ),
+            Text(
+              messageEtat(_grille),
+              style: const TextStyle(fontSize: 20.0)
+            ),
+            Text(
+              timer.elapsed.toString(),
+              style: const TextStyle(fontSize: 20.0),
+              ),
+            Builder(
+              builder: (context) {
+                return Visibility(
+                  visible: isOver,
+                  child: OutlinedButton(
+                    onPressed: () => gotoRes(_grille.isGagnee(), score),//widget.gotoRes(timer, _grille.isGagnee()),
+                    child: const Text(
+                      'Go to result screen',
+                      style: TextStyle(fontSize: 20.0)
+                      )
+                  ),
+                );
+              }
+            )
+          ]
+        )
       )
     );
   }
@@ -107,6 +125,16 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
   int getScore(int gridSize, Duration elapsedTime){
     int time = max(1, elapsedTime.inSeconds);
     return gridSize * gridSize ~/ time;
+  }
+
+  Color getBackgroundColor(bool isOver, modele.Grille grille){
+    if(!isOver){
+      return Colors.white;
+    }
+    if(grille.isGagnee()){
+      return Colors.greenAccent[100]!;
+    }
+    return Colors.red[100]!;
   }
 
 }

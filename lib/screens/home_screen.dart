@@ -52,6 +52,7 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
               child: TextField(
                 controller: ctrl,
                 maxLength: 50,
+                style: const TextStyle(fontSize: 20.0),
                 decoration: const InputDecoration(label: Text('Pseudonym')),
               )
             ),
@@ -66,6 +67,7 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
                             value: difficulty,
                             child: Text(
                               difficulty.name,
+                              style: const TextStyle(fontSize: 20.0),
                             ),
                           ),
                         )
@@ -81,7 +83,10 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
                   ),
                   const Spacer(),
                   TextButton(
-                    child: const Text("Play"),
+                    child: const Text(
+                      "Play",
+                      style: TextStyle(fontSize: 20.0),
+                    ),
                     onPressed: () => {
                       //widget.changeName(ctrl.text),
                       if(ctrl.text != ""){

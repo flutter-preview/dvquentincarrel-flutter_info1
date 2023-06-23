@@ -20,15 +20,31 @@ class ResultScreen extends ConsumerWidget {
         title: Text(ref.read(barText))
       ),
       body: Center(
-      child: Column(
-        children: [
-          Text('Player: $playerName'),
-          Text(message),
-          Text('Duration of your last game: $time'),
-          Text('Best score: ${score.toString()}'),
-          OutlinedButton(
-            onPressed: () => Navigator.of(context).popUntil(ModalRoute.withName('/')),
-            child: const Text('Go to main menu'))
+        child: Column(
+          children: [
+            Text(
+              'Player: $playerName',
+              style: const TextStyle(fontSize: 20.0),
+            ),
+            Text(
+              message,
+              style: const TextStyle(fontSize: 20.0),
+            ),
+            Text(
+              'Duration of your last game: $time',
+              style: const TextStyle(fontSize: 20.0),
+            ),
+            Text(
+            'Best score: ${score.toString()}',
+              style: const TextStyle(fontSize: 20.0),
+            ),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).popUntil(ModalRoute.withName('/')),
+              child: const Text(
+                'Go to main menu',
+                style: const TextStyle(fontSize: 20.0),
+              )
+            )
           ]
         )
       )
