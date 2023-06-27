@@ -14,7 +14,6 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() {
     return _HomeScreen();
   }
-
 }
 
 class _HomeScreen extends ConsumerState<HomeScreen> {

@@ -26,8 +26,10 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
 
   @override
   void initState() {
-    final timer = ref.read(gameProvider)['timer'] as Stopwatch;
-    timer.reset();
+    //final timer = ref.read(gameProvider)['timer'] as Stopwatch;
+    final Stopwatch timer = Stopwatch();
+    timer.start();
+    final timer = ref.read(timerState);
     super.initState();
   }
 
@@ -39,7 +41,6 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
     bool isOver = _grille.isFinie();
     final Stopwatch timer = gameState['timer'] as Stopwatch;
     int score = 0;
-    timer.start();
 
     if(isOver){
       timer.stop();

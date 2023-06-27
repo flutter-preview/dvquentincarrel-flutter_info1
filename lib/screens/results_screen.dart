@@ -11,8 +11,8 @@ class ResultScreen extends ConsumerWidget {
     final bool isWon = ref.read(gameProvider)['wasWon'] as bool;
     final String playerName = ref.read(playerProvider);
     final int score = ref.read(scoreProvider)[playerName] as int;
-    final Stopwatch timer = ref.read(gameProvider)['timer'] as Stopwatch;
-    final String time = getTime(timer);
+    //final Stopwatch timer = ref.read(gameProvider)['timer'] as Stopwatch;
+    final String time = getTime(ref.read(durationProvider));
 
     String message = isWon ? "You won!" : "You lost.";
     return Scaffold(
@@ -42,7 +42,7 @@ class ResultScreen extends ConsumerWidget {
               onPressed: () => Navigator.of(context).popUntil(ModalRoute.withName('/')),
               child: const Text(
                 'Go to main menu',
-                style: const TextStyle(fontSize: 20.0),
+                style: TextStyle(fontSize: 20.0),
               )
             )
           ]
@@ -51,8 +51,8 @@ class ResultScreen extends ConsumerWidget {
     );
   }
 
-  String getTime(Stopwatch timer){
-      String raw = timer.elapsed.toString();
+  String getTime(Duration duration){
+      String raw = duration.toString();
       int dotIndex = raw.indexOf('.');
       String polished = raw.substring(0, dotIndex);
       return polished;

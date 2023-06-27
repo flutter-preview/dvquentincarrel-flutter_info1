@@ -21,14 +21,6 @@ class GameState extends StateNotifier<Map<String, Object>>{
     state = {...state};
   }
 
-  void debug() => print(state);
-
 }
 
-//// TODO: fix
-//final timeProvider = Provider<Stopwatch>(
-//  (ref) => {
-//    final timer = Stopwatch();
-//    return timer; 
-//  }
-//  )
+final durationProvider = StateProvider<Duration>((ref) => const Duration(seconds: 0));
