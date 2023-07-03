@@ -10,7 +10,6 @@ import 'dart:math';
 
 class GridScreen extends ConsumerStatefulWidget {
   late modele.Grille grille;
-  // TODO: fetch those from the state
   final int gridSize;
   final int nbMines;
 
@@ -23,10 +22,11 @@ class GridScreen extends ConsumerStatefulWidget {
 }
 
 class _GrilleDemineur extends ConsumerState<GridScreen> {
+  Stopwatch timer = Stopwatch();
 
   @override
   void initState() {
-    final timer = ref.read(gameProvider)['timer'] as Stopwatch;
+    final timer = Stopwatch();
     timer.reset();
     super.initState();
   }
@@ -34,11 +34,11 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
   @override
   Widget build(BuildContext context)
   {
-    final gameState = ref.read(gameProvider);
     final modele.Grille _grille = widget.grille;
     bool isOver = _grille.isFinie();
-    final Stopwatch timer = gameState['timer'] as Stopwatch;
     int score = 0;
+    Size screenSize = MediaQuery.of(context).size;
+    double screenLimit = min(screenSize.width, screenSize.height);
     timer.start();
 
     if(isOver){
@@ -59,7 +59,7 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
               // Ligne -> Colonnes -> Cases
               children: [
                 const Spacer(),
-                ...sweeper.makeGrid(_grille, updateParent),
+                ...sweeper.makeGrid(_grille, updateParent, screenLimit),
                 const Spacer()
               ]
             ),
@@ -76,7 +76,7 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
                 return Visibility(
                   visible: isOver,
                   child: OutlinedButton(
-                    onPressed: () => gotoRes(_grille.isGagnee(), score),//widget.gotoRes(timer, _grille.isGagnee()),
+                    onPressed: () => gotoRes(_grille.isGagnee(), score, timer),//widget.gotoRes(timer, _grille.isGagnee()),
                     child: const Text(
                       'Go to result screen',
                       style: TextStyle(fontSize: 20.0)
@@ -103,17 +103,16 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
   }
 
   void updateParent(modele.Grille grille, int x, int y, modele.Action action){
-     setState(() => {
-         grille.mettreAJour(modele.Coup(y, x, action)),
-     });
+     setState(() => grille.mettreAJour(modele.Coup(y, x, action)));
   }
 
   // Updates state before going to results page
-  void gotoRes(bool wasWon, int score) {
-    final String name = ref.read(playerProvider);
+  void gotoRes(bool wasWon, int score, Stopwatch timer) {
+    final String name = ref.read(playerProvider.notifier).getLastPlayer();
+    ref.read(durationProvider.notifier).state = timer.elapsed;
 
     ref.read(gameProvider.notifier).updateGame(wasWon: wasWon);
-    ref.read(scoreProvider.notifier).updateScore(name, score);
+    ref.read(playerProvider.notifier).updateScore(name, score);
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -124,7 +123,7 @@ class _GrilleDemineur extends ConsumerState<GridScreen> {
 
   int getScore(int gridSize, Duration elapsedTime){
     int time = max(1, elapsedTime.inSeconds);
-    return gridSize * gridSize ~/ time;
+    return 100 * gridSize * gridSize ~/ time ;
   }
 
   Color getBackgroundColor(bool isOver, modele.Grille grille){

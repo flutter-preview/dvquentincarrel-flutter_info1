@@ -25,18 +25,24 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
     late String playerName;
     late difficulty.Difficulty diff;
 
+    late Map players;
+
+		@override
+		void initState(){
+			super.initState();
+      ctrl = TextEditingController();
+			ref.read(playerProvider.notifier).storage.ready.then((ready) {
+				playerName = ref.read(playerProvider.notifier).getLastPlayer();
+				ctrl.text = playerName;
+			});
+		}
+
     @override
     Widget build(BuildContext context) {
 
-      playerName = ref.watch(playerProvider);
+			Map players = ref.watch(playerProvider);
+			Future storageFuture = ref.watch(playerProvider.notifier).storage.ready;
       diff = difficulty.Difficulty(chosenDiff);
-
-      ctrl = TextEditingController();
-      ctrl.text = playerName;
-      ctrl.selection = TextSelection.fromPosition(TextPosition(offset: playerName.length));
-      ctrl.addListener(() {
-        ref.watch(playerProvider.notifier).setName(ctrl.text);
-      });
 
       final List<difficulty.Level> options = [for (difficulty.Level level in difficulty.Level.values) level];
 
@@ -44,66 +50,101 @@ class _HomeScreen extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text(ref.read(barText))
       ),
-      body: Center(
-        child: Column(
-          children: [
-            SizedBox(
-              width: 500,
-              child: TextField(
-                controller: ctrl,
-                maxLength: 50,
-                style: const TextStyle(fontSize: 20.0),
-                decoration: const InputDecoration(label: Text('Pseudonym')),
-              )
-            ),
-            SizedBox(
-              width: 500,
-              child: Row(
-                children: [
-                  DropdownButton(
-                    value: chosenDiff,
-                    items: options.map(
-                          (difficulty) => DropdownMenuItem(
-                            value: difficulty,
-                            child: Text(
-                              difficulty.name,
-                              style: const TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      if (value == null) {
-                        return;
-                      }
-                      setState(() {
-                        chosenDiff = value;
-                      });
-                    },
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    child: const Text(
-                      "Play",
-                      style: TextStyle(fontSize: 20.0),
-                    ),
-                    onPressed: () => {
-                      //widget.changeName(ctrl.text),
-                      if(ctrl.text != ""){
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => 
-                            GridScreen(gridSize: diff.taille, nbMines: diff.nbMines,)
-                          )
-                        )
-                      }
-                    },
-                  ),
-                ]
-              )
-            )
-          ]
-        )
-      )
+      body: FutureBuilder(
+				future: storageFuture,
+				builder: ((context, future) {
+					if(future.hasError) {
+						throw Error();
+					} else if(!future.hasData) {
+						return const Text("Loading page...");
+					}
+					return Center(
+						child: Column(
+							children: [
+								SizedBox(
+									width: 500,
+									child: TextField(
+										controller: ctrl,
+										maxLength: 50,
+										style: const TextStyle(fontSize: 20.0),
+										decoration: const InputDecoration(label: Text('Pseudonym')),
+									)
+								),
+								SizedBox(
+									width: 500,
+									child: Row(
+										children: [
+											DropdownButton(
+												value: chosenDiff,
+												items: options.map(
+															(difficulty) => DropdownMenuItem(
+																value: difficulty,
+																child: Text(
+																	difficulty.name,
+																	style: const TextStyle(fontSize: 20.0),
+																),
+															),
+														)
+														.toList(),
+												onChanged: (value) {
+													if (value == null) {
+														return;
+													}
+													setState(() {
+														chosenDiff = value;
+														playerName = ctrl.text;
+													});
+												},
+											),
+											const Spacer(),
+											TextButton(
+												child: const Text(
+													"Play",
+													style: TextStyle(fontSize: 20.0),
+												),
+												onPressed: () {
+													//widget.changeName(ctrl.text),
+													if(ctrl.text != "") {
+														ref.read(playerProvider.notifier).loadPlayer(ctrl.text);
+														ref.read(curPlayerProvider.notifier).state = ctrl.text;
+														Navigator.of(context).push(
+															MaterialPageRoute(builder: (context) => 
+																GridScreen(gridSize: diff.taille, nbMines: diff.nbMines,)
+															)
+														);
+													}
+												},
+											),
+										]
+									)
+								),
+								ScoreBoard()
+							]
+						)
+					);
+				})
+			)
       );
     }
+}
+
+// Making it stateful and reusing "players" from homescreen prevented update after 2 player changes for some reason
+class ScoreBoard extends ConsumerWidget {
+
+	@override
+	Widget build(BuildContext context, WidgetRef ref) {
+		Map players = ref.watch(playerProvider);
+		return Column(
+			children: [
+				const Text(
+					"Players:",
+					style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+				),
+				...players.entries.map((entry) => Text(
+					"${entry.key}:    ${entry.value}",
+					style: const TextStyle(fontSize: 20.0),
+				)).toList()
+			]
+		);
+	}
 }

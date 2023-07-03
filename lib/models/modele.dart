@@ -116,7 +116,6 @@ class Grille {
   // Met à jour la grille en fonction du coup joué
     void mettreAJour(Coup coup) {
         if(isFinie()) {
-            print('Game over');
             return;
         }
         Case chosenCase = getCase(coup.coordonnees);
@@ -136,7 +135,6 @@ class Grille {
             }
         }
     }
-    print('You won');
     return true;
   }
 
@@ -146,7 +144,6 @@ class Grille {
         for(int y = 0; y < taille; y++) {
             Case curCase = getCase(Coordonnees(y, x));
             if(curCase.decouverte && curCase.minee) {
-                print('You lost');
                 return true;
             }
         }

@@ -1,27 +1,46 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:localstorage/localstorage.dart';
 import 'dart:math';
 
-// Holds the player's name
-// TODO: see if most minimal way to do this
-final playerProvider = StateNotifierProvider<PlayerState, String>((ref) => PlayerState());
+final playerProvider = StateNotifierProvider<playerState, Map>((ref) => playerState());
+class playerState extends StateNotifier<Map> {
+		late LocalStorage storage;
 
-class PlayerState extends StateNotifier<String> {
-    PlayerState() : super('');
-    void setName(String text) => state = text;
-    void debug() => print(state);
+		playerState(): super({}) {
+			storage = LocalStorage("flutter_data.json");
+			storage.ready.then((ready) {
+				if(ready) {
+					state = storage.getItem("players");
+				} else {
+					throw Error();
+				}
+			});
+		}
+
+		// Attempts to load a player. Adds them if they don't exist
+		int loadPlayer(String player){
+			if(!state.containsKey(player)) {
+				state[player] = 0;
+				storage.setItem("players", state);
+			} 
+			int score = state[player]!;
+			storage.setItem("lastPlayer", player);
+			state = {...state};
+			return score;
+		}
+
+		String getLastPlayer(){
+			String lastplayer = storage.getItem("lastPlayer");
+			return lastplayer;
+		}
+
+		void updateScore(String name, int score){
+			state[name] = max(state[name] as int, score);
+			storage.setItem("players", state);
+			state = {...state};
+		}
 }
 
-final scoreProvider = StateNotifierProvider<ScoreState, Map<String, int>>((ref) => ScoreState());
+final storeProvider = Provider<LocalStorage>((ref) => LocalStorage("flutter_data.json"));
 
-class ScoreState extends StateNotifier<Map<String, int>> {
-    ScoreState(): super({});
-    void updateScore(String name, int score){
-        if(!state.containsKey(name)){
-            state[name] = score;
-        } else {
-            state[name] = max(state[name]!, score);
-        }
-        state = {...state};
-    }
-
-}
+final curPlayerProvider = StateProvider<String>((ref) => ref.read(playerProvider.notifier).getLastPlayer());

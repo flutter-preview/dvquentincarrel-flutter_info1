@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:demineur/models/modele.dart' as modele;
 
 // Constructs every single cell of the grid
-List makeGrid(modele.Grille grille,updateParent) {
+List makeGrid(modele.Grille grille,updateParent, screenSize) {
   List rows;
 
   int colIM = 0;
   int rowIM = 0;
-  double size = 750/grille.taille;
+  // Hacky and likely unflutter-like, but gets the job done
+  double size = screenSize * 0.8 / grille.taille;
 
-  // For each row, iter over its elems
+  // For each row, iter over its columns. For each column, generate a cell
   rows = grille.grille.map((row) {
     colIM = 0;
     var column = Column(children: [
-    // For each column in the row, generate a cell
     ...row.map((dCase) {
       return Cell(
            updateParent: updateParent,
@@ -31,6 +31,7 @@ List makeGrid(modele.Grille grille,updateParent) {
   return rows;
 }
 
+// Handles all the logic, updating and display of a single cell
 class Cell extends StatelessWidget {
 
   final void Function(modele.Grille, int, int, modele.Action) updateParent;
@@ -78,7 +79,7 @@ class Cell extends StatelessWidget {
     return btn;
   }
 
-  // "*" If undiscovered, "#nb" if there are any, nothing otherwise
+  // Context-dependant text changes of the cell
   String caseToText(modele.Case laCase, bool isFini)
   {
     if(laCase.marquee){
@@ -88,16 +89,17 @@ class Cell extends StatelessWidget {
       return "*";
     }
     if(laCase.minee) {
+      // Only if the user clicked on a bomb
       return "💣";
     } else if(laCase.nbMinesAutour > 0) {
+      // Number of bombs within the 8-neighbors, if any
       return laCase.nbMinesAutour.toString();
     } else {
       return "";
     }
   }
 
-  // Orange if marked, blue is undiscovered, grey otherwise.
-  // Everything undiscovered is green if won, and red if lost
+  // Context-dependant color changes of the cell
   Color caseToColor(modele.Case laCase)
   {
     if(laCase.marquee) {

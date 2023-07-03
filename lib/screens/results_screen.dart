@@ -9,10 +9,9 @@ class ResultScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isWon = ref.read(gameProvider)['wasWon'] as bool;
-    final String playerName = ref.read(playerProvider);
-    final int score = ref.read(scoreProvider)[playerName] as int;
-    final Stopwatch timer = ref.read(gameProvider)['timer'] as Stopwatch;
-    final String time = getTime(timer);
+    final String playerName = ref.watch(curPlayerProvider);
+    final int score = ref.watch(playerProvider)[playerName];
+    final String time = timeToString(ref.read(durationProvider));
 
     String message = isWon ? "You won!" : "You lost.";
     return Scaffold(
@@ -39,6 +38,7 @@ class ResultScreen extends ConsumerWidget {
               style: const TextStyle(fontSize: 20.0),
             ),
             OutlinedButton(
+							// Causes the home page not to properly refresh, particularly visible with the score board
               onPressed: () => Navigator.of(context).popUntil(ModalRoute.withName('/')),
               child: const Text(
                 'Go to main menu',
@@ -51,8 +51,8 @@ class ResultScreen extends ConsumerWidget {
     );
   }
 
-  String getTime(Stopwatch timer){
-      String raw = timer.elapsed.toString();
+  String timeToString(Duration duration){
+      String raw = duration.toString();
       int dotIndex = raw.indexOf('.');
       String polished = raw.substring(0, dotIndex);
       return polished;

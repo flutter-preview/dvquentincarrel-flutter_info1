@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:demineur/providers/player.dart';
 
 final gameProvider = StateNotifierProvider<GameState, Map<String, Object>>((ref) => GameState());
 
@@ -8,7 +9,6 @@ class GameState extends StateNotifier<Map<String, Object>>{
     'difficulty': 0,
     'score': 0,
     'wasWon': false,
-    'timer': Stopwatch(),
   });
 
   // Only updates provided values
@@ -16,19 +16,9 @@ class GameState extends StateNotifier<Map<String, Object>>{
     state['difficulty'] = difficulty ?? state['difficulty']!;
     state['score'] = score ?? state['score']!;
     state['wasWon'] = wasWon ?? state['wasWon']!;
-    // TODO: cleaner implementation
-    state['timer'] = timer ?? state['timer']!;
     state = {...state};
   }
 
-  void debug() => print(state);
-
 }
 
-//// TODO: fix
-//final timeProvider = Provider<Stopwatch>(
-//  (ref) => {
-//    final timer = Stopwatch();
-//    return timer; 
-//  }
-//  )
+final durationProvider = StateProvider<Duration>((ref) => Duration(hours:2));
